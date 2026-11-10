@@ -1,0 +1,19 @@
+__pycache__/
+.venv/
+*.pyc
+.pytest_cache/
+
+# runtime state is never source
+data/*
+!data/.gitkeep
+runs/
+research/
+.director_worktrees/
+
+# local overrides
+companion.local.json
+*.log
+*.err
+*.token
+*.db
+*.sqlite3

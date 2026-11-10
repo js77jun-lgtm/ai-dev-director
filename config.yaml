@@ -1,0 +1,81 @@
+# AI DEV DIRECTOR configuration
+# Strict NO PAY-PER-USE API policy: every agent runs through an official, signed-in CLI session
+# (Claude Code / OpenAI Codex / Google Antigravity). API keys in the environment are stripped before any CLI call.
+
+head:
+  provider: claude        # HEAD plans and directs corrections; the Reviewer judges independently.
+  # The model is whatever the CLI account's default model is; model flags are not passed through.
+  executable: null        # Discovered automatically (PATH or the standard install folder)
+
+builder:
+  mode: proposal          # Builder returns whole files as JSON; the Director validates and writes them.
+  provider: claude        # agy is not installed on this PC; was: antigravity (model: antigravity-cli)
+  model: claude-cli
+  executable: null        # Discovered automatically via resolve_cli('claude')
+
+reviewer:
+  provider: codex         # Primary REVIEWER: OpenAI Codex CLI (failover: claude)
+  model: codex-cli
+  executable: null        # Discovered automatically via resolve_cli('codex')
+
+timeouts:
+  head: 300
+  builder: 600
+  reviewer: 300
+  no_progress: 180
+  heartbeat: 30
+
+safety:
+  max_files_changed: 15
+  max_diff_lines: 1500     # Complete greenfield modules commonly exceed 800; path/file caps still apply.
+  approved_commands:
+    - python
+    - pytest
+    - npm
+    - cargo
+    - go
+    - make
+
+verification:
+  build_command: null
+  test_command: "python -m pytest tests/"
+  lint_command: null
+
+bootstrap:
+  enabled: true
+
+# Per-project verification (kept here, never inside the project, so a Builder cannot weaken it).
+# Keys are absolute project roots. Example:
+# projects:
+#   "D:/work/my_service":
+#     verification:
+#       build_command: ["npm", "run", "build"]
+#       test_command: "python -m pytest -q"
+projects: {}
+
+autonomy:
+  enabled: true
+  max_repairs: 3
+  # HEAD proxy: HEAD decides on the operator's behalf. Only money (payments, paid services, live-account orders),
+  # real credentials/accounts and irreversible external actions stop for a human decision.
+  head_proxy: true
+  builder_attempts: 3          # retry with feedback; the last attempt moves to another provider
+  max_steps: 6                 # milestones per mission
+  max_consecutive_failures: 3
+  resume_on_start: true        # a companion restart continues interrupted (RUNNING) missions; STOPPED ones stay stopped
+  # A finished mission is applied to the project on its own:
+  # off | on_done (only when HEAD declared the goal done) | on_pass (any PASSED deliverable).
+  # Apply never overwrites a file the operator changed meanwhile (conflict -> blocked, worktree kept) and never deletes.
+  auto_apply: on_pass
+  profiles:                    # budgets per request size; gates and Scope Guard are the same in every profile
+    quick:    {max_steps: 2, max_repairs: 1, builder_attempts: 2}
+    standard: {max_steps: 6, max_repairs: 3, builder_attempts: 3}
+    deep:     {max_steps: 12, max_repairs: 3, builder_attempts: 3}
+
+# Optional external commissioner (a separate "CEO" service that posts goal-level missions to /ops/solomon).
+# Only git projects under allowed_roots may be targeted; the Director's own folder is never a target.
+solomon:
+  allowed_roots:
+    - "D:/work"
+  denied:
+    - "D:/work/ai-dev-director"

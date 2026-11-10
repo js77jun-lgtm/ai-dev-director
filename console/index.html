@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI DEV DIRECTOR · TRINITY</title><link rel="stylesheet" href="/stage.css"><script src="/trinity.js" defer></script><script src="/stage.js" defer></script><script src="/console.js" defer></script></head>
+<body class="trinity" data-view="stage" data-phase="IDLE">
+<canvas id="trinity-canvas" aria-hidden="true"></canvas>
+<div id="intro" aria-hidden="true"><span>THREE MINDS</span><strong>ONE CORE</strong></div>
+
+<header id="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+    <div><strong>AI DEV DIRECTOR</strong><span>TRINITY · 세 AI, 하나의 지능</span></div>
+  </div>
+  <div class="top-meta">
+    <button type="button" id="top-project" class="meta-chip" title="작업할 폴더 바꾸기">프로젝트 · —</button>
+    <div id="replay-bar" hidden>
+      <span id="replay-text">지난 미션 다시보기</span>
+      <div class="replay-track"><i id="replay-fill"></i></div>
+      <button type="button" id="replay-stop">끝내기</button>
+    </div>
+    <span id="top-live" class="live-chip" data-mode="idle"><i aria-hidden="true"></i><b>STANDBY</b></span>
+    <span id="top-clock" class="meta-clock">--:--:--</span>
+  </div>
+  <nav class="top-actions" aria-label="화면 전환">
+    <button type="button" id="tab-stage" class="on" aria-pressed="true">스테이지</button>
+    <button type="button" id="tab-workshop" aria-pressed="false">작업실<em id="pending-badge" hidden></em></button>
+    <button type="button" id="btn-replay" title="지난 미션을 실제 기록으로 다시 보기 (R)">다시보기</button>
+    <button type="button" id="btn-broadcast" title="방송 모드 (B)">방송 모드</button>
+    <button type="button" id="btn-halt" title="실행 중인 미션을 멈춥니다 · 대시보드는 켜진 채로">작업 정지</button>
+    <button type="button" id="btn-shutdown" title="AI DEV 시스템 중지 · 기록과 작업본은 남습니다">시스템 중지</button>
+  </nav>
+</header>
+
+<main id="stage">
+  <aside id="panel-now" class="glass" aria-live="polite">
+    <span class="kicker">지금</span>
+    <h2 id="now-headline">연결 중…</h2>
+    <p id="now-sub">작업 기록을 읽고 있습니다.</p>
+    <div class="now-timer"><b id="now-elapsed">00:00</b><span id="now-stage">대기</span></div>
+
+    <section id="mission-card" class="card">
+      <div class="card-head"><span class="kicker">미션</span><span id="mission-badge" class="badge">—</span></div>
+      <p id="mission-goal">아직 미션 기록이 없습니다.</p>
+      <div id="mission-steps" class="steps" aria-label="미션 단계"></div>
+      <small id="mission-meta"></small>
+    </section>
+
+    <section class="feed">
+      <span class="kicker">진행 기록</span>
+      <ol id="event-feed"></ol>
+    </section>
+  </aside>
+
+  <section id="stage-center" aria-label="세 AI 작업 무대">
+    <div id="stinger" aria-hidden="true"></div>
+    <div id="role-menu" role="menu" hidden></div>
+    <div class="slot-label" data-slot="0"><span class="slot-role">HEAD · 지휘</span><strong class="slot-name">—</strong><span class="slot-status">대기</span><span class="slot-stat"></span></div>
+    <div class="slot-label" data-slot="1"><span class="slot-role">BUILDER · 구현</span><strong class="slot-name">—</strong><span class="slot-status">대기</span><span class="slot-stat"></span></div>
+    <div class="slot-label" data-slot="2"><span class="slot-role">REVIEWER · 검수</span><strong class="slot-name">—</strong><span class="slot-status">대기</span><span class="slot-stat"></span></div>
+
+    <div id="stage-foot">
+      <p id="caption"></p>
+      <div id="phase-box"><span class="kicker">TRINITY CORE</span><strong id="phase-word">대기</strong><small id="phase-sub">세 AI가 지시를 기다립니다</small></div>
+      <ol id="pipeline" aria-label="작업 흐름">
+        <li data-stage="PLANNING"><i></i><b>계획</b><span>HEAD</span></li>
+        <li data-stage="BUILDING"><i></i><b>구현</b><span>BUILDER</span></li>
+        <li data-stage="VERIFYING"><i></i><b>테스트</b><span>DIRECTOR</span></li>
+        <li data-stage="REVIEWING"><i></i><b>검수</b><span>REVIEWER</span></li>
+        <li data-stage="DECIDING"><i></i><b>판단</b><span>HEAD</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <aside id="panel-work" class="glass">
+    <div class="card-head">
+      <span class="kicker">AI별 작업량</span>
+      <div class="seg" id="win-tabs"><button type="button" data-win="mission">미션</button><button type="button" data-win="today">오늘</button><button type="button" data-win="all">전체</button></div>
+    </div>
+    <div class="total"><b id="total-tokens">0</b><span>토큰</span></div>
+    <small id="total-sub" class="total-sub">호출 0회 · CLI 0초</small>
+    <div id="share-bar" class="share" aria-hidden="true"><i data-p="ANTHROPIC"></i><i data-p="GOOGLE"></i><i data-p="OPENAI"></i></div>
+    <div id="role-rows"></div>
+    <section class="feed">
+      <span class="kicker">최근 AI 호출</span>
+      <ol id="call-feed"></ol>
+    </section>
+    <small class="footnote">~ 는 글자 수로 추정한 값, 없으면 CLI가 보고한 실제 토큰입니다.</small>
+  </aside>
+</main>
+
+<footer id="composer" class="glass">
+  <button type="button" id="chat-peek" aria-expanded="false" aria-controls="chat-log"><span id="peek-role">HEAD</span><span id="peek-text">대화 기록을 읽고 있습니다.</span></button>
+  <div id="chat-log" hidden></div>
+  <form id="chat-form">
+    <textarea id="chat-text" rows="1" maxlength="8000" placeholder="HEAD에게 지시하기 — 예: 캡션 글자 수 검사기를 만들어줘" aria-label="HEAD에게 지시하기"></textarea>
+    <button type="submit" id="chat-send">보내기</button>
+  </form>
+</footer>
+
+<div id="attention" hidden><span id="attention-text"></span><button type="button" id="attention-go">작업실에서 확인</button></div>
+<div id="workshop" hidden><iframe id="workspace" title="AI DEV 작업실"></iframe></div>
+<div id="shell-error" role="alert" hidden></div>
+</body></html>
